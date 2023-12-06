@@ -7,10 +7,7 @@
      (sequence->list (in-lines)))))
 
 (define (parse-to-numbers str)
-  (map
-   (lambda (a) (string->number a))
-   (string-split (string-replace str "  " " ") " "))
-  )
+  (map string->number (string-split (string-replace str "  " " ") " ")))
 
 (define raw-cards
   (map
