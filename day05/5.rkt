@@ -2,14 +2,10 @@
 
 (define lines
   (filter non-empty-string?
-          ; (with-input-from-file "input.txt"
-          (with-input-from-file "sample.txt"
+          (with-input-from-file "input.txt"
+            ; (with-input-from-file "sample.txt"
             (thunk
              (sequence->list (in-lines))))))
-
-(define seeds
-  (map string->number
-       (string-split (string-replace  (car lines) "seeds: " "") " ")))
 
 (define indexes
   (filter number?
@@ -37,24 +33,40 @@
         [range-length (third map-rule)])
     (if (and (>=  number source-range-start) (< number (+ source-range-start range-length)))
         (+ (- number source-range-start) destination-range-start)
-        number)))
+        #f)))
 
-(define (get-value-by-map number map)
-  (foldl (lambda (map-rule result) (get-value-by-map-rule result map-rule)) number map))
+(define (get-value-by-map number map-item)
+  (let ([values (filter number? (map (lambda (map-rule) (get-value-by-map-rule number map-rule)) map-item))])
+    (if (empty? values) number (first values))))
 
 (define (get-value-by-maps number maps)
   (foldl (lambda (map result) (get-value-by-map result map)) number maps))
 
-; (display (get-value-by-map 79 (first maps)))
-; (display (get-value-by-maps 79 maps))
-; (display "\n")
 
 ; ------ part one ------
-(define locations (map (lambda (seed) (get-value-by-maps seed maps)) seeds))
-(define part-two-answer (apply min locations))
-(display part-two-answer)
-(display "\n")
+(define seeds-part-one
+  (map string->number
+       (string-split (string-replace  (car lines) "seeds: " "") " ")))
+
+(define locations-1 (map (lambda (seed) (get-value-by-maps seed maps)) seeds-part-one))
+(define part-one-answer (apply min locations-1))
+(display part-one-answer)
+; (display "\n")
 ; ------ part one ------
 
 ; ------ part two ------
+(define seeds-ranges
+  (map
+   (lambda (idx)
+     (let ([start (list-ref seeds-part-one idx)]
+           [length (list-ref seeds-part-one (+ 1 idx))]
+           ) (cons start (+ start length))))
+   (range 0 (length seeds-part-one) 2)))
+
+(display  seeds-ranges)
+(display "\n")
+
+
+; (define part-two-answer (apply min locations-2))
+; (display part-two-answer)
 ; ------ part two ------
